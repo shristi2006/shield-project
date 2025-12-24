@@ -1,0 +1,38 @@
+
+
+node_modules/
+
+
+dist/
+build/
+*.tsbuildinfo
+
+# Environment variables
+
+.env
+.env.local
+.env.development
+.env.production
+
+# MongoDB
+
+data/
+*.mongodb
+
+
+# Logs
+
+logs/
+*.log
+
+# OS / Editor
+
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Coverage / Tests
+
+coverage/
+.nyc_output/
