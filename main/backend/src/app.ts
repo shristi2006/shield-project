@@ -1,13 +1,18 @@
-import express, { Application } from "express";
-import cors from "cors";
+import express, { Application } from 'express';
+import cors from 'cors';
+
+import authRoutes from './routes/auth.routes';
 
 const app: Application = express();
 
-app.use(cors());
+// Core middleware
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true,
+}));
 app.use(express.json());
 
-app.get("/", (_req, res) => {
-  res.send("server is running");
-});
+// Routes
+app.use('/api/auth', authRoutes);
 
 export default app;

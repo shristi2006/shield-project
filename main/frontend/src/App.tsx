@@ -1,20 +1,18 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
-
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import LoginPage from './pages/login';
+import AdminDashboard from './pages/admin/AdminDashboard';
+import AnalystDashboard from './pages/analyst/AnalystDashboard';
 function App() {
-  const [message, setMessage] = useState<string>("");
-
-  useEffect(() => {
-    axios.get("http://localhost:8000")
-      .then(res => setMessage(res.data))
-      .catch(console.error);
-  }, []);
-
   return (
-    <div>
-      <h1>MERN + TS</h1>
-      <p>{message}</p>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<LoginPage />} />
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route path="/analyst/dashboard" element={<AnalystDashboard />} />
+
+        {/* dashboards come later */}
+      </Routes>
+    </BrowserRouter>
   );
 }
 

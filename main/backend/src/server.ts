@@ -1,9 +1,8 @@
-import dotenv from "dotenv";
+import dotenv from 'dotenv';
 dotenv.config();
 
-console.log("ENV CHECK:", process.env.MONGO_URI);
-import app from "./app";
-import connectDB from "./config/db";
+import app from './app';
+import connectDB from './config/db';
 
 connectDB();
 
