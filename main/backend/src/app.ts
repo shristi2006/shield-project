@@ -1,4 +1,5 @@
 import express, { Application } from 'express';
+import { securityScanner } from "./middlewares/securityScanner";
 import cors from 'cors';
 
 import authRoutes from './routes/auth.routes';
@@ -12,7 +13,11 @@ app.use(cors({
 }));
 app.use(express.json());
 
+// ACTIVE DEFENSE LAYER (runs before routes)
+app.use(securityScanner);
+
 // Routes
 app.use('/api/auth', authRoutes);
+
 
 export default app;
