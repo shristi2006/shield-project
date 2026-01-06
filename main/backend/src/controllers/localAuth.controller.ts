@@ -56,7 +56,6 @@ export const localLogin = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Missing credentials" });
     }
 
-    // 👇 IMPORTANT FIX
     const user = await User.findOne({ email }).select("+password");
 
     if (!user || !user.password) {

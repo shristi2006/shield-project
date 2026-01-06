@@ -66,7 +66,7 @@ const UserSchema = new Schema<IUser>(
 
 /* ================= PRE-SAVE PASSWORD HASH ================= */
 
-// ✅ ASYNC HOOK — NO next()
+// ASYNC HOOK — NO next()
 UserSchema.pre("save", async function () {
   // Only hash password for LOCAL auth
   if (this.authProvider !== "LOCAL") return;
