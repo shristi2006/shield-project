@@ -86,7 +86,7 @@ export const securityScanner = async (
         },
       });
 
-      console.log("🚨 ATTACK BLOCKED", {
+      console.log("ATTACK BLOCKED", {
         attackType,
         severity,
         ip: ipAddress,
@@ -103,7 +103,7 @@ export const securityScanner = async (
 
     next();
   } catch (error) {
-    console.error("❌ Security Scanner Error:", error);
+    console.error("Security Scanner Error:", error);
     next(error); // never block traffic due to scanner failure
   }
 };

@@ -1,4 +1,5 @@
 import express, { Application } from 'express';
+import { ipBlocker } from "./middlewares/ipBlocker";
 import { securityScanner } from "./middlewares/securityScanner";
 import cors from 'cors';
 
@@ -12,6 +13,8 @@ app.use(cors({
   credentials: true,
 }));
 app.use(express.json());
+
+app.use(ipBlocker);
 
 // ACTIVE DEFENSE LAYER (runs before routes)
 app.use(securityScanner);
