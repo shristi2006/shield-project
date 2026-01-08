@@ -16,11 +16,15 @@
     "axios": "^1.13.2",
     "daisyui": "^5.5.14",
     "jwt-decode": "^4.0.0",
+    "lucide-react": "^0.562.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "react-hook-form": "^7.70.0",
     "react-hot-toast": "^2.6.0",
     "react-oauth": "^0.0.1",
     "react-router-dom": "^7.11.0",
+    "react-toastify": "^11.0.5",
+    "socket.io-client": "^4.8.3",
     "tailwind": "^4.0.0"
   },
   "devDependencies": {

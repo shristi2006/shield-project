@@ -1,7 +1,4 @@
-import SecurityLog, {
-  AttackType,
-  SeverityLevel,
-} from "../models/SecurityLog";
+import { SecurityLog, AttackType, SeverityLevel } from "../models/SecurityLog";
 import BlockedIP from "../models/BlockedIP";
 import { classifyThreat } from "../utils/threatClassifier";
 import { correlateIncident } from "./incidentCorrelator";

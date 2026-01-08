@@ -1,9 +1,12 @@
 import express, { Application } from 'express';
-import { ipBlocker } from "./middlewares/ipBlocker";
-import { securityScanner } from "./middlewares/securityScanner";
+import { ipBlocker } from "./middleware/ipBlocker";
+import { securityScanner } from "./middleware/securityScanner";
 import cors from 'cors';
 
 import authRoutes from './routes/auth.routes';
+import logRoutes from './routes/log.routes';
+import incidentRoutes from './routes/incident.routes';
+import blockedIPRoutes from './routes/blockedIP.routes';
 
 const app: Application = express();
 
@@ -21,6 +24,9 @@ app.use(securityScanner);
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use("/api/logs", logRoutes);
+app.use("/api/incidents", incidentRoutes);
+app.use("/api/blocked-ips", blockedIPRoutes);
 
 
 export default app;

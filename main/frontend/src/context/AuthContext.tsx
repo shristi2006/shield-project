@@ -1,46 +1,76 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useEffect, useState } from "react";
+import type { User, AuthState } from "@/types/auth.types";
+import axios from "@/api/axios";
 
-interface User {
-  email: string;
-  name?: string;
-  role: 'ADMIN' | 'ANALYST';
-}
-
-interface AuthContextType {
-  user: User | null;
-  login: (token: string, user: User) => void;
+interface AuthContextType extends AuthState {
+  login: (email: string, password: string) => Promise<void>;
   logout: () => void;
+  loading: boolean;
 }
 
-const AuthContext = createContext<AuthContextType | null>(null);
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<User | null>(() => {
-    const stored = localStorage.getItem('user');
-    return stored ? JSON.parse(stored) : null;
-  });
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const login = (token: string, user: User) => {
-    localStorage.setItem('token', token);
-    localStorage.setItem('user', JSON.stringify(user));
-    setUser(user);
+  // 🔁 Restore session on refresh
+  useEffect(() => {
+    const storedToken = localStorage.getItem("token");
+    if (storedToken) {
+      setToken(storedToken);
+      fetchMe(storedToken);
+    } else {
+      setLoading(false);
+    }
+  }, []);
+
+  const fetchMe = async (jwt: string) => {
+    try {
+      const res = await axios.get<User>("/auth/me", {
+        headers: {
+          Authorization: `Bearer ${jwt}`,
+        },
+      });
+      setUser(res.data);
+    } catch (err) {
+      logout();
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const login = async (email: string, password: string) => {
+    const res = await axios.post<{
+      token: string;
+      user: User;
+    }>("/auth/login", { email, password });
+
+    localStorage.setItem("token", res.data.token);
+    setToken(res.data.token);
+    setUser(res.data.user);
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    localStorage.removeItem("token");
     setUser(null);
+    setToken(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        token,
+        login,
+        logout,
+        loading,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
-};
-
-export const useAuth = () => {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth must be used inside AuthProvider');
-  return ctx;
 };

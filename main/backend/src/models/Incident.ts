@@ -1,8 +1,8 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
-export interface IIncident extends Document {
+export interface IIncident extends mongoose.Document {
   title: string;
-  description: string;
+  ip: string;
   severity: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
   status: "OPEN" | "ASSIGNED" | "IN_PROGRESS" | "RESOLVED";
   logs: mongoose.Types.ObjectId[];
@@ -12,33 +12,25 @@ export interface IIncident extends Document {
 
 const IncidentSchema = new Schema<IIncident>(
   {
-    title: {
-      type: String,
-      required: true
-    },
-    description: {
-      type: String
-    },
+    title: { type: String, required: true },
+
+    ip: { type: String, required: true, index: true },
+
     severity: {
       type: String,
       enum: ["LOW", "MEDIUM", "HIGH", "CRITICAL"],
-      required: true
+      required: true,
     },
+
     status: {
       type: String,
       enum: ["OPEN", "ASSIGNED", "IN_PROGRESS", "RESOLVED"],
-      default: "OPEN"
+      default: "OPEN",
     },
-    logs: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Log"
-      }
-    ],
-    assignedTo: {
-      type: Schema.Types.ObjectId,
-      ref: "User"
-    },
+
+    logs: [{ type: Schema.Types.ObjectId, ref: "SecurityLog" }],
+
+    assignedTo: { type: Schema.Types.ObjectId, ref: "User" },
     notes: {
       type: String
     }
@@ -46,4 +38,9 @@ const IncidentSchema = new Schema<IIncident>(
   { timestamps: true }
 );
 
-export default mongoose.model<IIncident>("Incident", IncidentSchema);
+IncidentSchema.index({ ip: 1, status: 1 });
+
+export const Incident = mongoose.model<IIncident>(
+  "Incident",
+  IncidentSchema
+);

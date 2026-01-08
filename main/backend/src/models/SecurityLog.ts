@@ -61,9 +61,8 @@ const SecurityLogSchema = new Schema<ISecurityLog>(
   }
 );
 
-const SecurityLog = mongoose.model<ISecurityLog>(
+export const SecurityLog = mongoose.model<ISecurityLog>(
   "SecurityLog",
   SecurityLogSchema
 );
 
-export default SecurityLog;

@@ -1,4 +1,4 @@
-import SecurityLog from "../models/SecurityLog";
+import { SecurityLog }from "../models/SecurityLog";
 import BlockedIP from "../models/BlockedIP";
 import { getIO } from "../sockets";
 import {
