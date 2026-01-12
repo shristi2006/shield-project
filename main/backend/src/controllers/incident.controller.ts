@@ -5,7 +5,7 @@ import { Types } from "mongoose";
 export const getIncidents = async (_req: Request, res: Response) => {
   try {
     const incidents = await Incident.find()
-      .populate("assignedTo", "email role")
+      .populate("assignedTo", "email", "role")
       .sort({ createdAt: -1 });
 
     res.json(incidents);
@@ -16,6 +16,8 @@ export const getIncidents = async (_req: Request, res: Response) => {
 
 export const assignIncident = async (req: Request, res: Response) => {
   try {
+    console.log("ASSIGN INCIDENT HIT");
+
     if (!req.user) {
       return res.status(401).json({ message: "Unauthorized" });
     }
@@ -30,30 +32,68 @@ export const assignIncident = async (req: Request, res: Response) => {
 
     await incident.save();
 
-    const io = getIO();
-    io.emit("incident:update", incident);
+    // 🔌 socket emit (non-blocking)
+    try {
+      const io = getIO();
+      io.emit("incident:update", {
+        id: incident._id,
+        status: incident.status,
+        assignedTo: incident.assignedTo,
+        severity: incident.severity,
+        updatedAt: incident.updatedAt,
+      });
+    } catch {
+      console.warn("Socket not initialized, skipping emit");
+    }
 
-    res.status(200).json(incident);
+    return res.json(incident);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Assignment failed" });
+    console.error("Assign incident failed:", err);
+    return res.status(500).json({ message: "Assignment failed" });
   }
 };
 
 export const updateIncidentStatus = async (req: Request, res: Response) => {
   try {
+    const { status } = req.body;
+
+    if (!status) {
+      return res.status(400).json({ message: "Status is required" });
+    }
+
+    const allowed = ["OPEN", "ASSIGNED", "IN_PROGRESS", "RESOLVED"];
+    if (!allowed.includes(status)) {
+      return res.status(400).json({
+        message: `Invalid status. Allowed: ${allowed.join(", ")}`,
+      });
+    }
+
     const incident = await Incident.findByIdAndUpdate(
       req.params.id,
-      { status: req.body.status },
-      { new: true }
+      { status },
+      { new: true, runValidators: true }
     );
 
-    const io = getIO();
-    io.emit("incident:update", incident);
+    if (!incident) {
+      return res.status(404).json({ message: "Incident not found" });
+    }
+    try {
+      const io = getIO();
+      io.emit("incident:update", {
+        id: incident._id,
+        status: incident.status,
+        assignedTo: incident.assignedTo,
+        severity: incident.severity,
+        updatedAt: incident.updatedAt,
+      });
+    } catch {
+      console.warn("Socket not initialized, skipping emit");
+    }
 
-    res.json(incident);
-  } catch {
-    res.status(500).json({ message: "Update failed" });
+    return res.json(incident);
+  } catch (err) {
+    console.error("Update incident status failed:", err);
+    return res.status(500).json({ message: "Update failed" });
   }
 };
 
@@ -64,23 +104,31 @@ export const addIncidentNote = async (req: Request, res: Response) => {
     }
 
     const incident = await Incident.findById(req.params.id);
-    if (!incident) return res.status(404).json({ message: "Not found" });
-
-    if (!incident.notes) {
-      incident.notes = "";
+    if (!incident) {
+      return res.status(404).json({ message: "Not found" });
     }
 
+    incident.notes = incident.notes || "";
     incident.notes += `\n${req.user.id}: ${req.body.text}`;
-      createdAt: new Date();
 
     await incident.save();
 
-    const io = getIO();
-    io.emit("incident:update", incident);
+    try {
+      const io = getIO();
+      io.emit("incident:update", {
+        id: incident._id,
+        status: incident.status,
+        assignedTo: incident.assignedTo,
+        severity: incident.severity,
+        updatedAt: incident.updatedAt,
+      });
+    } catch {
+      console.warn("Socket not initialized, skipping emit");
+    }
 
-    res.json(incident);
-  } catch {
-    res.status(500).json({ message: "Note failed" });
+    return res.json(incident);
+  } catch (err) {
+    console.error("Note failed:", err);
+    return res.status(500).json({ message: "Note failed" });
   }
 };
-

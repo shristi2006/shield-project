@@ -3,10 +3,17 @@ import BlockedIP from "../models/BlockedIP";
 import { classifyThreat } from "../utils/threatClassifier";
 import { correlateIncident } from "./incidentCorrelator";
 import { getIO } from "../sockets";
-
+import { resolveGeo } from "../utils/geoResolver";
+import { getCachedGeo } from "../utils/geoCache";
 /* ------------------ helpers ------------------ */
 
-const ipPool = ["10.0.0.12", "10.0.0.13", "10.0.0.14"];
+const ipPool = [
+  "8.8.8.8",        // USA
+  "1.1.1.1",        // Australia
+  "91.198.174.192", // Europe
+  "103.21.244.0"    // India
+];
+
 
 const randomIP = () =>
   ipPool[Math.floor(Math.random() * ipPool.length)];
@@ -31,14 +38,20 @@ function generateAttack() {
 
   const severity: SeverityLevel = classifyThreat(attackType);
 
-  return {
-    attackType,
-    severity,
-    ip: randomIP(),
-    endpoint: "/api/auth/login",
-    method: "POST",
-    payload: attackPayloads[attackType],
-  };
+  const ip = randomIP();
+  const geo = getCachedGeo(ip, resolveGeo)
+;
+
+return {
+  attackType,
+  severity,
+  ip,
+  endpoint: "/api/auth/login",
+  method: "POST",
+  geo,
+  payload: attackPayloads[attackType],
+};
+
 }
 
 /* ------------------ simulator ------------------ */
@@ -53,7 +66,8 @@ export const startAttackSimulator = (intervalMs = 5000) => {
       const attack = generateAttack();
 
       // Save security log
-      await SecurityLog.create(attack);
+      const logData = { ...attack, geo: attack.geo ?? undefined };
+      await SecurityLog.create(logData);
 
       // Correlation engine
       await correlateIncident(attack.ip);

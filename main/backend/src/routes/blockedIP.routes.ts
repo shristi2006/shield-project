@@ -11,14 +11,12 @@ const router = Router();
 router.get(
   "/",
   authMiddleware,
-  requireRole,
   getBlockedIPs
 );
 
 router.post(
   "/",
   authMiddleware,
-  requireRole,
   blockIP
 );
 

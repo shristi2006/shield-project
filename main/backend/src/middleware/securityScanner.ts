@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import SecurityLog, { AttackType } from "../models/SecurityLog";
+import {SecurityLog, AttackType } from "../models/SecurityLog";
 import { classifyThreat } from "../utils/threatClassifier";
 
 /* ---------------- ATTACK PATTERNS ---------------- */

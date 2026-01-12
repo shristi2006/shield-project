@@ -6,6 +6,9 @@ import {
   BRUTE_FORCE_WINDOW_MS,
   CRITICAL_THRESHOLD,
 } from "../utils/correlationRules";
+import {Incident} from "../models/Incident";
+
+
 
 export const correlateIncident = async (ip: string) => {
   try {
@@ -14,7 +17,24 @@ export const correlateIncident = async (ip: string) => {
 
     // ---------- Brute Force ----------
     const since = new Date(now - BRUTE_FORCE_WINDOW_MS);
+    const existing = await Incident.findOne({
+  ip,
+  status: { $ne: "RESOLVED" }
+});
 
+if (!existing) {
+  const incident = await Incident.create({
+  title: "Brute Force Attack Detected",
+  ip,
+  logs: [],
+  severity: "HIGH",
+  priority: "HIGH",
+  status: "OPEN",
+});
+
+
+  io.emit("incident:new", incident);
+}
     const bruteAttempts = await SecurityLog.countDocuments({
       ip,
       attackType: "BRUTE_FORCE",

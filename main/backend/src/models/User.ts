@@ -1,8 +1,6 @@
 import mongoose, { Schema, Document } from "mongoose";
 import bcrypt from "bcryptjs";
 
-/* ================= TYPES ================= */
-
 export type UserRole = "ADMIN" | "ANALYST";
 export type AuthProvider = "GOOGLE" | "LOCAL";
 
@@ -14,9 +12,8 @@ export interface IUser extends Document {
   authProvider: AuthProvider;
   avatar?: string;
   createdAt: Date;
+  comparePassword(password: string): Promise<boolean>;
 }
-
-/* ================= SCHEMA ================= */
 
 const UserSchema = new Schema<IUser>(
   {
@@ -30,7 +27,10 @@ const UserSchema = new Schema<IUser>(
 
     password: {
       type: String,
-      select: false, //  never return password
+      select: false,
+      required: function (this: IUser) {
+        return this.authProvider === "LOCAL";
+      },
     },
 
     name: {
@@ -50,33 +50,27 @@ const UserSchema = new Schema<IUser>(
       required: true,
     },
 
-    avatar: {
-      type: String,
-    },
+    avatar: String,
 
     createdAt: {
       type: Date,
       default: Date.now,
     },
   },
-  {
-    versionKey: false,
-  }
+  { versionKey: false }
 );
 
-/* ================= PRE-SAVE PASSWORD HASH ================= */
-
-// ASYNC HOOK — NO next()
+/* Hash password */
 UserSchema.pre("save", async function () {
-  // Only hash password for LOCAL auth
   if (this.authProvider !== "LOCAL") return;
-
-  // Skip if password not modified or missing
   if (!this.isModified("password") || !this.password) return;
-
   this.password = await bcrypt.hash(this.password, 10);
 });
 
-/* ================= EXPORT ================= */
+UserSchema.methods.comparePassword = async function (candidate: string) {
+  if (!this.password) return false;
+  return bcrypt.compare(candidate, this.password);
+};
+
 
 export default mongoose.model<IUser>("User", UserSchema);

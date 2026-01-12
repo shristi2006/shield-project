@@ -15,21 +15,18 @@ router.get("/", authMiddleware, getIncidents);
 router.post(
   "/:id/assign",
   authMiddleware,
-  requireRole,
   assignIncident
 );
 
 router.patch(
   "/:id/status",
   authMiddleware,
-  requireRole,
   updateIncidentStatus
 );
 
 router.post(
   "/:id/notes",
   authMiddleware,
-  requireRole,
   addIncidentNote
 );
 

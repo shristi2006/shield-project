@@ -4,11 +4,15 @@ export interface IIncident extends mongoose.Document {
   title: string;
   ip: string;
   severity: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
+  priority: "LOW" | "MEDIUM" | "HIGH";
   status: "OPEN" | "ASSIGNED" | "IN_PROGRESS" | "RESOLVED";
+  updatedAt: Date;
+  createdAt: Date;
   logs: mongoose.Types.ObjectId[];
   assignedTo?: mongoose.Types.ObjectId;
   notes?: string;
 }
+
 
 const IncidentSchema = new Schema<IIncident>(
   {
@@ -21,12 +25,19 @@ const IncidentSchema = new Schema<IIncident>(
       enum: ["LOW", "MEDIUM", "HIGH", "CRITICAL"],
       required: true,
     },
+    priority: {
+      type: String,
+      enum: ["LOW", "MEDIUM", "HIGH"],
+      required: true,
+    },
 
     status: {
       type: String,
       enum: ["OPEN", "ASSIGNED", "IN_PROGRESS", "RESOLVED"],
       default: "OPEN",
     },
+    updatedAt: { type: Date, default: Date.now },
+    createdAt: { type: Date, default: Date.now },
 
     logs: [{ type: Schema.Types.ObjectId, ref: "SecurityLog" }],
 

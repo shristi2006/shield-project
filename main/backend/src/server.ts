@@ -7,19 +7,16 @@ import connectDB from "./config/db";
 import { initSocket } from "./sockets";
 import { startAttackSimulator } from "./services/attackSimulator";
 
-connectDB();
+const PORT = Number(process.env.PORT) || 8000;
 
-const PORT = process.env.PORT || 8000;
+(async () => {
+  await connectDB();
+  const server = http.createServer(app);
 
-//  REQUIRED for Socket.io
-const server = http.createServer(app);
+  initSocket(server);
 
-//  Initialize socket engine
-initSocket(server);
-
-server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
-
-//  Start simulator AFTER server is ready
-startAttackSimulator(5000);
+  server.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+    startAttackSimulator(PORT);
+  });
+})();
