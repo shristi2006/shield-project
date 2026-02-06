@@ -1,3 +1,4 @@
+// src/middleware/requireRole.ts
 import { Request, Response, NextFunction } from 'express';
 import { UserRole } from '../models/User';
 

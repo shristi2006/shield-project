@@ -1,3 +1,4 @@
+// src/models/Incident.ts
 import mongoose, { Schema } from "mongoose";
 
 export interface IIncident extends mongoose.Document {

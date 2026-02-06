@@ -1,3 +1,4 @@
+// src/services/attackSimulator.ts
 import { SecurityLog, AttackType, SeverityLevel } from "../models/SecurityLog";
 import BlockedIP from "../models/BlockedIP";
 import { classifyThreat } from "../utils/threatClassifier";
@@ -11,7 +12,6 @@ const ipPool = [
   "8.8.8.8",        // USA
   "1.1.1.1",        // Australia
   "91.198.174.192", // Europe
-  "103.21.244.0"    // India
 ];
 
 

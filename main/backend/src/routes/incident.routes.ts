@@ -1,3 +1,4 @@
+// src/routes/incident.routes.ts
 import { Router } from "express";
 import {
   getIncidents,

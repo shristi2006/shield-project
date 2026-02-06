@@ -1,3 +1,4 @@
+// src/controllers/log.controller.ts
 import { Request, Response } from "express";
 import {SecurityLog} from "../models/SecurityLog";
 

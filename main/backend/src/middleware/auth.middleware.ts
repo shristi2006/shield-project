@@ -1,3 +1,4 @@
+// src/middleware/auth.middleware.ts
 import { Request, Response, NextFunction } from "express";
 import { verifyJwt } from "../utils/jwt";
 export const authMiddleware = (

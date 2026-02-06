@@ -14,17 +14,14 @@ const app: Application = express();
 
 // Core middleware
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: "http://localhost:5173",
   credentials: true,
 }));
 app.use(express.json());
-
-app.use(ipBlocker);
-
-// ACTIVE DEFENSE LAYER (runs before routes)
-app.use(securityScanner);
 // Routes
-app.use('/api/auth', authRoutes);
+app.use("/api/auth", authRoutes);
+app.use(securityScanner);
+app.use(ipBlocker);
 app.use("/api/logs", logRoutes);
 app.use("/api/incidents", incidentRoutes);
 app.use("/api/blocked-ips", blockedIPRoutes);

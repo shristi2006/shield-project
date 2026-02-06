@@ -1,3 +1,4 @@
+// src/routes/blockedIP.routes.ts
 import { Router } from "express";
 import {
   getBlockedIPs,

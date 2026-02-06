@@ -1,3 +1,4 @@
+// src/models/BlockedIP.ts
 import mongoose, { Schema, Document } from "mongoose";
 
 export interface IBlockedIP extends Document {

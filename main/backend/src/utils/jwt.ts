@@ -1,3 +1,4 @@
+// src/utils/jwt.ts
 import jwt, { JwtPayload as BaseJwtPayload } from "jsonwebtoken";
 import { UserRole } from "../models/User";
 

@@ -1,3 +1,4 @@
+// src/controllers/incident.controller.ts
 import { Request, Response } from "express";
 import {Incident} from "../models/Incident";
 import { getIO } from "../sockets/index";

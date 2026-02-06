@@ -1,3 +1,4 @@
+// src/utils/threatClassifier.ts
 import { AttackType, SeverityLevel } from "../models/SecurityLog";
 
 export const classifyThreat = (

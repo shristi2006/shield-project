@@ -1,63 +1,51 @@
-import { createContext, useEffect, useState } from "react";
-import type { User, AuthState } from "@/types/auth.types";
-import axios from "@/api/axios";
+import React, { createContext, useContext, useState, useEffect, type ReactNode } from "react";
+import type { User } from "@/types/api";
 
-interface AuthContextType extends AuthState {
-  login: (email: string, password: string) => Promise<void>;
+interface AuthContextType {
+  user: User | null;
+  token: string | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  login: (token: string, user: User) => void;
   logout: () => void;
-  loading: boolean;
 }
 
-export const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // 🔁 Restore session on refresh
   useEffect(() => {
+    // Load user from localStorage on mount
     const storedToken = localStorage.getItem("token");
-    if (storedToken) {
-      setToken(storedToken);
-      fetchMe(storedToken);
-    } else {
-      setLoading(false);
+    const storedUser = localStorage.getItem("user");
+
+    if (storedToken && storedUser) {
+      try {
+        setToken(storedToken);
+        setUser(JSON.parse(storedUser));
+      } catch {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+      }
     }
+    setIsLoading(false);
   }, []);
 
-  const fetchMe = async (jwt: string) => {
-    try {
-      const res = await axios.get<User>("/auth/me", {
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-        },
-      });
-      setUser(res.data);
-    } catch (err) {
-      logout();
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const login = async (email: string, password: string) => {
-    const res = await axios.post<{
-      token: string;
-      user: User;
-    }>("/auth/login", { email, password });
-
-    localStorage.setItem("token", res.data.token);
-    setToken(res.data.token);
-    setUser(res.data.user);
+  const login = (newToken: string, newUser: User) => {
+    localStorage.setItem("token", newToken);
+    localStorage.setItem("user", JSON.stringify(newUser));
+    setToken(newToken);
+    setUser(newUser);
   };
 
   const logout = () => {
     localStorage.removeItem("token");
-    setUser(null);
+    localStorage.removeItem("user");
     setToken(null);
+    setUser(null);
   };
 
   return (
@@ -65,12 +53,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       value={{
         user,
         token,
+        isAuthenticated: !!token && !!user,
+        isLoading,
         login,
         logout,
-        loading,
       }}
     >
       {children}
     </AuthContext.Provider>
   );
+};
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
 };

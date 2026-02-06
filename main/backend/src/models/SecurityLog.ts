@@ -1,3 +1,4 @@
+// src/models/SecurityLog.ts
 import mongoose, { Schema, Document } from "mongoose";
 
 export type AttackType =

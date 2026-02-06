@@ -1,3 +1,4 @@
+// src/models/Blocklist.ts
 import mongoose, { Schema, Document } from "mongoose";
 
 export interface IBlocklist extends Document {
