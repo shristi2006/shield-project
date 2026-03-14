@@ -7,6 +7,7 @@ import {
   AlertTriangle,
   LogOut,
   Menu,
+  Bot,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -30,6 +31,7 @@ const analystNavItems = [
   { title: "Overview", url: "/analyst", icon: LayoutDashboard },
   { title: "Live Logs", url: "/analyst/logs", icon: FileText },
   { title: "Incidents", url: "/analyst/incidents", icon: AlertTriangle },
+  { title: "AI Assistant", url: "/analyst/chat", icon: Bot },
 ];
 
 const AnalystSidebarContent: React.FC = () => {

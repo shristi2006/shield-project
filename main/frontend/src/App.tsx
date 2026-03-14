@@ -21,6 +21,7 @@ import AnalystDashboard from "./pages/AnalystDashboard";
 import AnalystOverview from "./pages/analyst/Overview";
 import AnalystLogs from "./pages/analyst/Logs";
 import AnalystIncidents from "./pages/analyst/Incidents";
+import AnalystChat from "./pages/analyst/Chat"; 
 
 const queryClient = new QueryClient();
 
@@ -61,6 +62,7 @@ const App = () => (
               <Route index element={<AnalystOverview />} />
               <Route path="logs" element={<AnalystLogs />} />
               <Route path="incidents" element={<AnalystIncidents />} />
+              <Route path="chat" element={<AnalystChat />} />
             </Route>
 
             {/* Catch-all */}
